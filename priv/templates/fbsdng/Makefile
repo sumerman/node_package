@@ -33,7 +33,7 @@ build: packing_list_files
 packing_list_files: $(BUILD_STAGE_DIR)
 	@mv ${BUILDDIR}/fbsdng/+MANIFEST ${BUILD_STAGE_DIR}
 	@cd $(BUILD_STAGE_DIR) && \
-		echo "version: ${PKG_VERSION}" >> +MANIFEST
+		echo "version: ${PKG_VERSION}" >> +MANIFEST && \
 		echo "files:" >> +MANIFEST
 
 	@echo "Copying Man pages to staging directory"
@@ -56,15 +56,8 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	@cd $(BUILD_STAGE_DIR) && \
 		echo "directories:" >> +MANIFEST && \
 		echo "- {{platform_base_dir}}" >> +MANIFEST && \
-		echo "- {{platform_data_dir}}" >> +MANIFEST && \
+		echo "- {{platform_data_dir}}: {uname {{package_install_user}}, gname: {{package_install_group}}}" >> +MANIFEST && \
 		echo "- {{platform_etc_dir}}" >> +MANIFEST 
-
-# templates: $(BUILD_STAGE_DIR)
-# 	@echo "Copying metadata files to package"
-# 	cp $(PKGERDIR)/+DESC $(PKGERDIR)/+COMMENT $(PKGERDIR)/+DEINSTALL \
-#            $(PKGERDIR)/+MTREE_DIRS $(PKGERDIR)/+DISPLAY \
-#            $(BUILD_STAGE_DIR)
-
 
 # Copy the app rel directory to the staging directory to build our
 # package structure and move the directories into the right place
