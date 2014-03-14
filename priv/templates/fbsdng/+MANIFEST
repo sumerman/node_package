@@ -15,3 +15,4 @@ scripts:
   pre-install: |-
     if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi
     if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_base_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi
+    if ! -f /var/log/{package_install_name}; then mkdir /var/log/{{package_install_name}} && chown {{package_install_user}}:{{package_install_group}} /var/log/{{package_install_name}}; fi
