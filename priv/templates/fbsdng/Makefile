@@ -69,12 +69,11 @@ packing_list_files: $(BUILD_STAGE_DIR)
 
 
 	@echo "Packaging /usr/local files"
-	@cd $(BUILD_STAGE_DIR)
-	find . -type f | while read file ; do \
-	    mode=$(stat -f%p "$file" | cut -c 3-) \
-	    fixedfile=$$(echo $$file | cut -c 3-) \
+	@cd $(BUILD_STAGE_DIR) && \
+	find usr -type f | while read file ; do \
+	    mode=$(stat -f%p "$$file" | cut -c 3-) \
 	    sum=$$(sha256 -q $$file) \
-	    echo "  /$$fixedfile: { sum: $$sum, uname: root, gname: wheel, perm: $$mode }" >> +MANIFEST; done
+	    echo "  /$$file: { sum: $$sum, uname: {{package_install_user}}, gname: {{package_install_group}}, perm: $$mode }" >> +MANIFEST; done
 
 	echo "directories:" >> +MANIFEST
 	echo "- {{platform_base_dir}}" >> +MANIFEST
