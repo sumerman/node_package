@@ -21,4 +21,4 @@
 }.
 {template, "Makefile", "Makefile"}.
 {template, "vars.config", "vars.config"}.
-{template, "manifest_header", "+MANIFEST"}.
+{template, "+MANIFEST", "+MANIFEST"}.
