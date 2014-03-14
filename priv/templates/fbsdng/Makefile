@@ -57,8 +57,11 @@ manifest_file_section: $(BUILD_STAGE_DIR)
 
 
 packing_list_files: $(BUILD_STAGE_DIR)
-	@echo "files:" >> +MANIFEST
+	@cd $(BUILD_STAGE_DIR) && \
+		@echo "files:" >> +MANIFEST
+
 	@echo "Copying Man pages to staging directory"
+	@cd $(BUILD_STAGE_DIR) && \
 	if [ -d doc/man/man1 ]; then \
 		mkdir -p $(PMAN_DIR) && \
 		cp -R doc/man/man1 $(PMAN_DIR) && \
@@ -67,18 +70,18 @@ packing_list_files: $(BUILD_STAGE_DIR)
                                      ; fi && \
 		{{/package_commands}} echo -n; fi
 
-
 	@echo "Packaging /usr/local files"
 	@cd $(BUILD_STAGE_DIR) && \
 	find usr -type f | while read file ; do \
-	    mode=$(stat -f%p "$$file" | cut -c 3-) \
-	    sum=$$(sha256 -q $$file) \
+	    mode=$$(stat -f%p "$$file" | cut -c 3-) && \
+	    sum=$$(sha256 -q $$file) && \
 	    echo "  /$$file: { sum: $$sum, uname: {{package_install_user}}, gname: {{package_install_group}}, perm: $$mode }" >> +MANIFEST; done
 
-	echo "directories:" >> +MANIFEST
-	echo "- {{platform_base_dir}}" >> +MANIFEST
-	echo "- {{platform_data_dir}}" >> +MANIFEST
-	echo "- {{platform_etc_dir}}" >> +MANIFEST
+	@cd $(BUILD_STAGE_DIR) && \
+		echo "directories:" >> +MANIFEST && \
+		echo "- {{platform_base_dir}}" >> +MANIFEST && \
+		echo "- {{platform_data_dir}}" >> +MANIFEST && \
+		echo "- {{platform_etc_dir}}" >> +MANIFEST 
 
 # templates: $(BUILD_STAGE_DIR)
 # 	@echo "Copying metadata files to package"
