@@ -51,13 +51,13 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	find usr -type f | while read file ; do \
 	    mode=$$(stat -f%p "$$file" | cut -c 3-) && \
 	    sum=$$(sha256 -q $$file) && \
-	    echo "  /$$file: { sum: $$sum, uname: {{package_install_user}}, gname: {{package_install_group}}, perm: $$mode }" >> +MANIFEST; done
+	    echo "  /$$file: { sum: $$sum, perm: $$mode }" >> +MANIFEST; done
 
 	@cd $(BUILD_STAGE_DIR) && \
 		echo "directories:" >> +MANIFEST && \
-		echo "- {{platform_base_dir}}" >> +MANIFEST && \
-		echo "- {{platform_data_dir}}: {uname {{package_install_user}}, gname: {{package_install_group}}}" >> +MANIFEST && \
-		echo "- {{platform_etc_dir}}" >> +MANIFEST 
+		echo "  {{platform_base_dir}}: {}" >> +MANIFEST && \
+		echo "  {{platform_data_dir}}: {uname {{package_install_user}}, gname: {{package_install_group}}}" >> +MANIFEST && \
+		echo "  {{platform_etc_dir}}: {}" >> +MANIFEST
 
 # Copy the app rel directory to the staging directory to build our
 # package structure and move the directories into the right place
