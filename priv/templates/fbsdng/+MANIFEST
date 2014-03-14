@@ -11,3 +11,7 @@ groups: [{{package_install_group}}]
 prefix: /usr/local
 categories: [{{freebsd_package_category}}]
 desc: "{{package_desc}}"
+scripts:
+  pre-install: |-
+    if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi
+    if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_base_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi
