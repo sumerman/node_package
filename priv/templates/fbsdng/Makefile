@@ -107,7 +107,7 @@ $(BUILD_STAGE_DIR): buildrel
 	cp -R rel/{{package_install_name}}/releases $(PLIB_DIR)
 	mkdir -p $(PDATA_DIR)
 	cp -R rel/{{package_install_name}}/data/* $(PDATA_DIR)
-        cp +MANIFEST $(BUILD_STAGE_DIR)/+MANIFEST
+	cp +MANIFEST $(BUILD_STAGE_DIR)/+MANIFEST
 
 
 # Build the release we need to package
