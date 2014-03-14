@@ -58,7 +58,7 @@ manifest_file_section: $(BUILD_STAGE_DIR)
 
 packing_list_files: $(BUILD_STAGE_DIR)
 	@cd $(BUILD_STAGE_DIR) && \
-		@echo "files:" >> +MANIFEST
+		echo "files:" >> +MANIFEST
 
 	@echo "Copying Man pages to staging directory"
 	@cd $(BUILD_STAGE_DIR) && \
