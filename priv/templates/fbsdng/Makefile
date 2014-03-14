@@ -65,7 +65,7 @@ packing_list_files: $(BUILD_STAGE_DIR)
                 {{#package_commands}}if [ -f doc/man/man1/{{name}}.1.gz ]; then \
                                          echo "  /usr/local/man/man1/{{name}}.1.gz" >> +MANIFEST \
                                      ; fi && \
-		{{/package_commands}}; echo -n ;fi
+		{{/package_commands}} echo -n; fi
 
 
 	@echo "Packaging /usr/local files"
