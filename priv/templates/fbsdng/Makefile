@@ -3,13 +3,13 @@ BUILD_STAGE_DIR = $(BUILDDIR)/{{package_name}}
 
 # Where we install things (based on vars.config)
 # /usr/local based dirs
-PMAN_DIR         = $(BUILD_STAGE_DIR)/man
-PBIN_DIR         = $(BUILD_STAGE_DIR)/{{bin_or_sbin}}
-PETC_DIR         = $(BUILD_STAGE_DIR)/etc/{{package_install_name}}
-PLIB_DIR         = $(BUILD_STAGE_DIR)/lib/{{package_install_name}}
+PMAN_DIR         = $(BUILD_STAGE_DIR)/usr/local/man
+PBIN_DIR         = $(BUILD_STAGE_DIR)/{{platform_bin_dir}}
+PETC_DIR         = $(BUILD_STAGE_DIR)/{{platform_etc_dir}}
+PLIB_DIR         = $(BUILD_STAGE_DIR)/{{platform_base_dir}}
 # /var based dirs
 PDATA_DIR        = $(BUILD_STAGE_DIR)/{{platform_data_dir}}
-PLOG_DIR         = $(BUILD_STAGE_DIR)/log/{{package_install_name}}
+PLOG_DIR         = $(BUILD_STAGE_DIR)/var/log/{{package_install_name}}
 
 # For scanning later, remove the leading slash
 # '/var/db/server' becomes 'var/db/server'
@@ -52,81 +52,40 @@ build: packing_list_files templates
 #   back to the default so the /var/db/pkg directory
 #   doesn't get set to something bad (which is a
 #   horrible bug in pkg_add).
-packing_list_files: $(BUILD_STAGE_DIR)
-	@echo "Adding to packaging list {{package_name}}-$(PKG_VERSION)"
-	echo "@name {{package_name}}-$(PKG_VERSION)" >> plist
-	echo "@conflicts {{package_name}}-*" >> plist
-	echo "@exec if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi" >> plist
-	echo "@exec if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_base_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi" >> plist
-	echo "@comment ORIGIN:{{freebsd_package_category}}/{{package_install_name}}" >> plist
 
+manifest_file_section: $(BUILD_STAGE_DIR)
+
+
+packing_list_files: $(BUILD_STAGE_DIR)
+	@echo "files:" >> +MANIFEST
 	@echo "Copying Man pages to staging directory"
 	if [ -d doc/man/man1 ]; then \
 		mkdir -p $(PMAN_DIR) && \
 		cp -R doc/man/man1 $(PMAN_DIR) && \
-		echo "@cwd /usr/local" >> plist  && \
-		echo "@owner root" >> plist && \
-		echo "@group wheel" >> plist && \
                 {{#package_commands}}if [ -f doc/man/man1/{{name}}.1.gz ]; then \
-                                         echo "man/man1/{{name}}.1.gz" >> plist \
+                                         echo "  /usr/local/man/man1/{{name}}.1.gz" >> +MANIFEST \
                                      ; fi && \
-		{{/package_commands}} echo -n; fi
+		{{/package_commands}}; fi
 
-	@echo "Scanning data and log directories for empty directories to add"
-	$(eval DIRS_INSTALL = {{platform_log_dir}})
-	$(eval DIRS_INSTALL += $(shell cd $(BUILD_STAGE_DIR) && find $(PDATA_ROOT_DIR) -type d -exec printf "/%s " {} \;))
-	for i in $(DIRS_INSTALL); \
-	    do                          \
-		echo "@exec mkdir -p $$i" >> plist; \
-                echo "@exec chown -R {{package_install_user}}:{{package_install_group}} $$i" >> plist; \
-		echo "@exec chmod 700 $$i" >> plist; \
-	    done
-
-	@echo "Copying staging package listing to +CONTENTS"
-	mv plist $(BUILD_STAGE_DIR)/+CONTENTS
 
 	@echo "Packaging /usr/local files"
-	cd $(BUILD_STAGE_DIR) && \
-	   echo "@cwd /usr/local" >> +CONTENTS && \
-	   echo "@owner {{package_install_user}}" >> +CONTENTS && \
-	   echo "@group {{package_install_group}}" >> +CONTENTS && \
-	   echo "@mode 0755" >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   find {{bin_or_sbin}} -type f >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   find lib -type f >> +CONTENTS && \
-	   find lib -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
-	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_base_dir}}" >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   echo "@owner root" >> +CONTENTS && \
-	   echo "@group wheel" >> +CONTENTS && \
-	   echo "@mode 0644" >> +CONTENTS && \
-	   find etc -type f >> +CONTENTS && \
-	   find etc -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS
+	@cd $(BUILD_STAGE_DIR)
+	@find . -type f | while read file ; do \
+	    mode=$(stat -f%p "$file" | cut -c 3-) \
+	    fixedfile=$$(echo $$file | cut -c 3-) \
+	    sum=$$(sha256 -q $$file) \
+	    echo "  /$$fixedfile: { sum: $$sum, uname: root, gname: wheel, perm: $$mode }" >> +MANIFEST \
+	done
+	echo "directories:" >> +MANIFEST
+	echo "- {{platform_base_dir}}" >> +MANIFEST
+	echo "- {{platform_data_dir}}" >> +MANIFEST
+	echo "- {{platform_etc_dir}}" >> +MANIFEST
 
-	@echo "Packaging /var files"
-	cd $(BUILD_STAGE_DIR) && \
-	   echo "@cwd /var" >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   echo "@owner {{package_install_user}}" >> +CONTENTS && \
-	   echo "@group {{package_install_group}}" >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   find var/db -type f >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   find log -type f >> +CONTENTS
-
-	cd $(BUILD_STAGE_DIR) && \
-	   echo "@owner" >> +CONTENTS && \
-	   echo "@group" >> +CONTENTS && \
-	   echo "@mode"  >> +CONTENTS && \
-	   echo "@display +DISPLAY" >> +CONTENTS
-
-
-templates: $(BUILD_STAGE_DIR)
-	@echo "Copying metadata files to package"
-	cp $(PKGERDIR)/+DESC $(PKGERDIR)/+COMMENT $(PKGERDIR)/+DEINSTALL \
-           $(PKGERDIR)/+MTREE_DIRS $(PKGERDIR)/+DISPLAY \
-           $(BUILD_STAGE_DIR)
+# templates: $(BUILD_STAGE_DIR)
+# 	@echo "Copying metadata files to package"
+# 	cp $(PKGERDIR)/+DESC $(PKGERDIR)/+COMMENT $(PKGERDIR)/+DEINSTALL \
+#            $(PKGERDIR)/+MTREE_DIRS $(PKGERDIR)/+DISPLAY \
+#            $(BUILD_STAGE_DIR)
 
 
 # Copy the app rel directory to the staging directory to build our
@@ -146,7 +105,6 @@ $(BUILD_STAGE_DIR): buildrel
 	cp -R rel/{{package_install_name}}/releases $(PLIB_DIR)
 	mkdir -p $(PDATA_DIR)
 	cp -R rel/{{package_install_name}}/data/* $(PDATA_DIR)
-	mkdir -p $(PLOG_DIR)
 
 
 # Build the release we need to package
