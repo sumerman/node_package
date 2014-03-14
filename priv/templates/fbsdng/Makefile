@@ -31,7 +31,7 @@ build: packing_list_files
 	; done
 
 packing_list_files: $(BUILD_STAGE_DIR)
-	@mv ${BUILDDIR}/+MANIFEST ${BUILD_STAGE_DIR}
+	@mv ${BUILDDIR}/fbsdng/+MANIFEST ${BUILD_STAGE_DIR}
 	@cd $(BUILD_STAGE_DIR) && \
 		echo "files:" >> +MANIFEST
 
