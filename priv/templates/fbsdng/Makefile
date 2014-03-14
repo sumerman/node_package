@@ -18,45 +18,20 @@ PDATA_ROOT_DIR   = $(shell echo "{{platform_data_dir}}" | cut -d'/' -f 2-4)
 TARNAME = {{package_name}}-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tar
 PKGNAME = {{package_name}}-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tbz
 
-build: packing_list_files templates
+build: packing_list_files
 	@echo "Building package $(PKGNAME)"
-	mkdir -p packages
-	cd $(BUILD_STAGE_DIR) && \
-	tar -cf $(TARNAME) +CONTENTS +COMMENT +DESC +MTREE_DIRS +DEINSTALL +DISPLAY
-	cd $(BUILD_STAGE_DIR) && \
-	find man -type f | tar -rf $(TARNAME) -T - && \
-	find {{bin_or_sbin}} -type f | tar -rf $(TARNAME) -T - && \
-	find lib -type f | tar -rf $(TARNAME) -T - && \
-	find etc -type f | tar -rf $(TARNAME) -T - && \
-	find var -type f | tar -rf $(TARNAME) -T - && \
-	find log -type f | tar -rf $(TARNAME) -T -
 
 	cd $(BUILD_STAGE_DIR) && \
 	mkdir ../../packages && \
-	gzip $(TARNAME) && \
-	mv $(TARNAME).gz ../../packages/$(PKGNAME)
+	pkg create -m . -r . -o ../../packages
 
 	cd ../packages && \
-		for tarfile in *.tbz; do \
+		for tarfile in *.txz; do \
 		shasum -a 256 $${tarfile} > $${tarfile}.sha \
 	; done
 
-# Where most of the magic (horror?) happens
-# Create a packing list according to pkg_create(1)
-# Write initial settings to a local file then copy
-#   to the destination folder where we use 'find'
-#   to populate the files and directories
-# Regarding @owner and @group callouts
-#   They work on files, but not on directories.
-#   Also, the last callout should be blank to revert
-#   back to the default so the /var/db/pkg directory
-#   doesn't get set to something bad (which is a
-#   horrible bug in pkg_add).
-
-manifest_file_section: $(BUILD_STAGE_DIR)
-
-
 packing_list_files: $(BUILD_STAGE_DIR)
+	@mv ${BUILDDIR}/+MANIFEST ${BUILD_STAGE_DIR}
 	@cd $(BUILD_STAGE_DIR) && \
 		echo "files:" >> +MANIFEST
 
