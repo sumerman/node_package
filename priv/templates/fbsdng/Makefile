@@ -56,7 +56,7 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	@cd $(BUILD_STAGE_DIR) && \
 		echo "directories:" >> +MANIFEST && \
 		echo "  {{platform_base_dir}}: {}" >> +MANIFEST && \
-		echo "  {{platform_data_dir}}: {uname {{package_install_user}}, gname: {{package_install_group}}}" >> +MANIFEST && \
+		echo "  {{platform_data_dir}}: {uname: {{package_install_user}}, gname: {{package_install_group}} }" >> +MANIFEST && \
 		echo "  {{platform_etc_dir}}: {}" >> +MANIFEST
 
 # Copy the app rel directory to the staging directory to build our
