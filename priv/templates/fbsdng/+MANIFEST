@@ -1,5 +1,4 @@
 name: {{package_name}}
-version: PACKAGE_VERSION
 origin: {{freebsd_package_category}}
 comment: {{package_shortdesc}}
 licenses: [{{license_type}}]

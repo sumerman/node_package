@@ -33,6 +33,7 @@ build: packing_list_files
 packing_list_files: $(BUILD_STAGE_DIR)
 	@mv ${BUILDDIR}/fbsdng/+MANIFEST ${BUILD_STAGE_DIR}
 	@cd $(BUILD_STAGE_DIR) && \
+		echo "version: ${PKG_VERSION}" >> +MANIFEST
 		echo "files:" >> +MANIFEST
 
 	@echo "Copying Man pages to staging directory"
