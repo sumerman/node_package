@@ -10,6 +10,7 @@
 %% installed by node_package (github.com/basho/node_package)
 
 main(Args) ->
+    io:setopts([{encoding, unicode}]),
     ok = start_epmd(),
     %% Extract the args
     {RestArgs, TargetNode} = process_args(Args, [], undefined),
