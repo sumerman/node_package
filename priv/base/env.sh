@@ -38,7 +38,7 @@ PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 # default it if it is not set
 ULIMIT_WARN={{runner_ulimit_warn}}
 if [ -z "$ULIMIT_WARN" ]; then
-    ULIMIT_WARN=4096
+    ULIMIT_WARN=""
 fi
 
 # Registered process to wait for to consider start a success
