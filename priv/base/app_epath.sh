@@ -2,7 +2,7 @@
 
 ## ---------------------------------------------------------------------
 ##
-## app_epath.sh: Parse Erlang app.config with POSIX tools for automation
+## app_epath.sh: Parse Erlang sys.config with POSIX tools for automation
 ##
 ## Copyright (c) 2013 Basho Technologies, Inc.  All Rights Reserved.
 ##
@@ -30,7 +30,7 @@
 # . path/to/app_epath.sh
 # 
 # # Build the path info
-# epaths=`make_app_epaths path/to/app.config`
+# epaths=`make_app_epaths path/to/sys.config`
 #
 # # View all of the settings. Quotes are important.
 # echo "$epaths"
@@ -54,7 +54,7 @@
 # #!/bin/sh
 # 
 # # $1 quoted eterm path for search: 'riak_core ring_creation_size'
-# # $2 path/to/app.config
+# # $2 path/to/sys.config
 # 
 # . path/to/app_epath.sh
 # 
@@ -63,7 +63,7 @@
 #
 ## End epath command
 
-# make_app_epaths takes a path to an app.config file as its argument and
+# make_app_epaths takes a path to an sys.config file as its argument and
 # and returns (prints) a flattened text structure of configuration settings.
 
 make_app_epaths () {

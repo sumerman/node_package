@@ -58,7 +58,7 @@ case "$1" in
         # Make sure there is not already a node running
         node_down_check
 
-        # Sanity check the app.config file
+        # Sanity check the sys.config file
         check_config > /dev/null
         ES=$?
         if [ "$ES" -ne 0 ]; then
@@ -216,7 +216,7 @@ case "$1" in
             exit 1
         fi
 
-        # Sanity check the app.config file
+        # Sanity check the sys.config file
         check_config
         ES=$?
         if [ "$ES" -ne 0 ]; then
@@ -235,7 +235,7 @@ case "$1" in
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
         CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
-             -config $RUNNER_ETC_DIR/app.config \
+             -config $RUNNER_ETC_DIR/sys.config \
             -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU

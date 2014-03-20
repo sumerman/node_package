@@ -31,9 +31,9 @@ if [ "$2" = "PRE-INSTALL" ]; then
         cp {{platform_etc_dir}}/vm.args {{platform_etc_dir}}/vm.args.bak
     fi
 
-    if [ -f {{platform_etc_dir}}/app.config ]; then
-        echo "Config file exists: backing up {{platform_etc_dir}}/app.config to {{platform_etc_dir}}/app.config.bak"
-        cp {{platform_etc_dir}}/app.config {{platform_etc_dir}}/app.config.bak
+    if [ -f {{platform_etc_dir}}/sys.config ]; then
+        echo "Config file exists: backing up {{platform_etc_dir}}/sys.config to {{platform_etc_dir}}/sys.config.bak"
+        cp {{platform_etc_dir}}/sys.config {{platform_etc_dir}}/sys.config.bak
     fi
 
 fi

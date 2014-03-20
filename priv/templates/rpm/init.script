@@ -5,7 +5,7 @@
 # chkconfig: 2345 80 30
 # description: {{package_shortdesc}}
 # processname: beam
-# config: /etc/{{package_install_name}}/app.config
+# config: /etc/{{package_install_name}}/sys.config
 # config: /etc/{{package_install_name}}/vm.args
 #
 
