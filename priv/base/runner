@@ -110,6 +110,7 @@ case "$1" in
         fi
 
         # Attempt to create .pid file
+        sleep 1
         create_pid_file
         ;;
 
